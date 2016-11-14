@@ -1,0 +1,28 @@
+{
+  "name": "data-visualization",
+  "version": "1.0.0",
+  "description": "A project to visualize data using D3.js",
+  "main": "import.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rahulr91/data-visualization.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rahulr91/data-visualization/issues"
+  },
+  "homepage": "https://github.com/rahulr91/data-visualization#readme",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "io-square": "^0.1.5",
+    "redis": "^2.6.3",
+    "socket.io": "^1.5.1"
+  },
+  "devDependencies": {}
+}
