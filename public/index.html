@@ -3,23 +3,24 @@
 <head>
 	<title>Data Visualization</title>
 	<script src="./d3.v4.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="./style.css"  media="screen,projection"/>
 </head>
 <body>
+	<nav>
+        <div id="nav">
+            <a id="name">
+            Data Visualization
+            </a>
+        </div>
+    </nav>
+
 	<div id="visualization" style="width: 50px; height: 50px">
 		<p id = "text"></p>
 	</div>
 	
-	<script type="text/javascript" src="./visualization.js"></script>
+
 	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
-	<script type="text/javascript">
-		var socket = io()
-		var arr = []
-		socket.on('download', function(json) {
-			arr.push(json)
-			document.getElementById('text').innerHTML = arr.length			
-		})
-
-
-	</script>
+	<script type="text/javascript" src="./visualization.js"></script>
+	
 </body>
 </html>

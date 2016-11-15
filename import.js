@@ -18,7 +18,7 @@ function importData (data) {
 }
 
 function setBorough (borough, id) {
-  client.incr(borough + '_counter') // count the number of restaurants in each borough
+  // client.incr(borough + '_counter') // count the number of restaurants in each borough
   client.sadd('boroughs', borough, function (err, reply) {
     console.log(reply)
   })
@@ -27,9 +27,9 @@ function setBorough (borough, id) {
   })
 }
 
-// check this function before running it
+// function to set cuisine in redis
 function setCuisine (cuisine, id) {
-  client.incr(cuisine + '_counter') // count the number of restaurants by cuisine
+  // client.incr(cuisine + '_counter') // count the number of restaurants by cuisine
   client.sadd('cuisines', cuisine, function (err, reply) {
     console.log(reply)
   })
@@ -50,4 +50,4 @@ function flushData () {
   })
 }
 // flushData() // use this to flush the entire db
-importData(data)
+importData(data) // use this to fill data in redis

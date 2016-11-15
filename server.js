@@ -8,6 +8,7 @@ IO.redis.setClient(2)
 var app = express()
 const http = require('http').Server(app)
 const sio = require('socket.io')(http)
+const sstream = require('socket.io-stream')
 
 app.use(express.static(path.resolve('.') + '/public'))
 app.use(bodyparser.json())
@@ -43,13 +44,13 @@ const parse = obj => {
 // })
 // })
 
-sio.on('connection', function (socket) {
-  socket.on('download', function () {
-    IO.redis.hgetall('restaurants').then(v => {
-      sio.emit('download', v)
-    })
-  })
-})
+// sio.on('connection', function (socket) {
+//   socket.on('download', function () {
+//     IO.redis.hgetall('restaurants').then(v => {
+//       sio.emit('download', v)
+//     })
+//   })
+// })
 
 app.get('/data/boroughs', function (req, res) {
   IO.redis.smembers('boroughs').then(v => {
