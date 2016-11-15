@@ -30,51 +30,27 @@ const parse = obj => {
     'id': obj.restaurant_id
   }
 }
-// app.get('/data/all', function (req, res) {
 
-// IO.redis.hgetall('restaurants').map(v => {
-//   for (i in v) {
-//     v[i] = JSON.parse(v[i])
-//   }
-//   return v
-// }).then(v => {
-//   // console.log(v)
-//   res.send(v)
-// // res.end()
-// })
-// })
+app.get('/data/borough', function (req, res) {
+  IO.redis.hgetall('borough_counts').then(v => {
+    res.send(JSON.stringify(v))
+  })
+})
 
-// sio.on('connection', function (socket) {
-//   socket.on('download', function () {
-//     IO.redis.hgetall('restaurants').then(v => {
-//       sio.emit('download', v)
-//     })
-//   })
-// })
+app.get('/data/cuisine', function (req, res) {
+  IO.redis.hgetall('cuisine_counts').then(v => {
+    res.send(JSON.stringify(v))
+  })
+})
 
-app.get('/data/boroughs', function (req, res) {
-  IO.redis.smembers('boroughs').then(v => {
+app.get('/data/grade', function (req, res) {
+  IO.redis.hgetall('grades').then(v => {
     res.send(v)
   })
 })
 
-app.get('/data/borough/count/:name', function (req, res) {
-  var boroughName = req.params.name
-  IO.redis.get(boroughName + '_counter').then(v => {
-    res.send(v)
-  })
-})
-
-app.get('/data/restaurants/:borough_name', function (req, res) {
-  var borough_name = req.params.borough_name
-  IO.redis.smembers(borough_name).then(v => {
-    res.send(v)
-  })
-})
-
-app.get('/data/restaurant/details/:id', function (req, res) {
-  var id = req.params.id
-  IO.redis.hget('restaurants', id).then(v => {
+app.get('/data/score', function (req, res) {
+  IO.redis.hgetall('score').then(v => {
     res.send(v)
   })
 })

@@ -1,57 +1,50 @@
-var socket = io()
-fetchBoroughData()
-function fetchBoroughData () {
+function getData (type, callback) {
   var xhr = new XMLHttpRequest()
-  xhr.open('GET', '/data/boroughs', true)
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-      var arr = JSON.parse(xhr.responseText)
-      console.log(arr)
-      for (var i = 0; i < arr.length; i++) {
-        getResInBorough(arr[i])
-      }
-    }
-  }
-  xhr.setRequestHeader('content-type', 'application/json')
-  xhr.send()
-}
-function getResInBorough (borough) {
-  var xhr = new XMLHttpRequest()
-  xhr.open('GET', '/data/borough/count/' + borough, true)
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-      console.log(borough + ': ' + xhr.responseText)
-    }
-  }
-  xhr.setRequestHeader('content-type', 'application/json')
-  xhr.send()
-}
-
-function fetchData () {
-  var xhr = new XMLHttpRequest()
-  xhr.open('GET', '/data/restaurants/Manhattan', true)
+  xhr.open('GET', '/data/' + type, true)
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200) {
       var response = JSON.parse(xhr.responseText)
-      response.forEach(element => {
-        getDetails(element)
-      })
+      var obj = {}
+      for (key in response) {
+        obj[key] = parseInt(response[key])
+      }
+      callback(obj)
     }
   }
   xhr.setRequestHeader('content-type', 'application/json')
   xhr.send()
 }
-// fetchData()
 
-function getDetails (restaurant_id) {
-  var xhr = new XMLHttpRequest()
-  xhr.open('GET', '/data/restaurant/details/' + restaurant_id, true)
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-      var response = xhr.responseText
-      console.log(response)
-    }
-  }
-  xhr.setRequestHeader('content-type', 'application/json')
-  xhr.send()
+function drawBar (data) {
+  console.log(data, '\ndrawing bar chart')
 }
+
+function drawColumn (data) {
+  console.log(data, '\ndrawing column chart')
+}
+
+function drawPie (data) {
+  console.log(data, '\ndrawing Pie chart')
+}
+
+function drawLine (data) {
+  console.log(data, '\ndrawing Line chart')
+}
+
+function drawArea (data) {
+  console.log(data, '\ndrawing Area Chart')
+}
+
+function drawScatter (data) {
+  console.log(data, '\ndrawing Scatter chart')
+}
+
+function draw () {
+  var cat = document.getElementById('category')
+  var catType = cat.options[cat.selectedIndex].value
+  var chart = document.getElementById('chartType')
+  var chartType = chart.options[chart.selectedIndex].value
+  getData(catType, window['draw' + chartType])
+}
+draw()
+// getData('cuisine')

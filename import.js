@@ -1,5 +1,9 @@
 var fs = require('fs')
-var data = JSON.parse(fs.readFileSync('dataset.json'))
+fs.readFile('dataset.json', 'utf8', (err, data) => {
+  if (err) { console.log(err)}else {
+    importData(JSON.parse(data))
+  }
+})
 var redis = require('redis')
 var client = redis.createClient({port: 6379, host: '127.0.0.1', db: 2})
 
@@ -19,29 +23,24 @@ function importData (data) {
 
 function setBorough (borough, id) {
   // client.incr(borough + '_counter') // count the number of restaurants in each borough
-  client.sadd('boroughs', borough, function (err, reply) {
-    console.log(reply)
-  })
-  client.sadd(borough, id, function (err, reply) {
-    console.log(reply)
-  })
+  client.sadd('boroughs', borough, redis.print)
+  // client.sadd(borough, id, redis.print)
+  client.hincrby('borough_counts', borough, 1, redis.print)
 }
 
 // function to set cuisine in redis
 function setCuisine (cuisine, id) {
   // client.incr(cuisine + '_counter') // count the number of restaurants by cuisine
-  client.sadd('cuisines', cuisine, function (err, reply) {
-    console.log(reply)
-  })
-  client.sadd(cuisine, id, function (err, reply) {
-    console.log(reply)
-  })
+  client.sadd('cuisines', cuisine, redis.print)
+  client.hincrby('cuisine_counts', cuisine, 1, redis.print)
+// client.sadd(cuisine, id, redis.print)
 }
 
 function setGrades (grades, id) {
-  client.hset('grades', id, JSON.stringify(grades), function (err, reply) {
-    console.log(reply)
-  })
+  if (grades.length !== 0) {
+    client.hincrby('grades', grades[0].grade.toString(), 1)
+    client.hincrby('score', JSON.stringify(grades[0].score), 1)
+  }
 }
 
 function flushData () {
@@ -50,4 +49,3 @@ function flushData () {
   })
 }
 // flushData() // use this to flush the entire db
-importData(data) // use this to fill data in redis

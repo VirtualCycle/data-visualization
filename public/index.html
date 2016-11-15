@@ -13,11 +13,30 @@
             </a>
         </div>
     </nav>
-
-	<div id="visualization" style="width: 50px; height: 50px">
-		<p id = "text"></p>
-	</div>
-	
+    
+    <div id="selection">
+    	<div id="category-select" style="display: inline-block;">
+	    	Select category
+	    	<select id="category" onchange="draw()">
+	    		<option value="borough">Borough</option>
+	    		<option value="cuisine">Cuisine</option>
+	    		<option value="grade">Grade</option>
+	    		<option value="score">Score</option>
+	    	</select>
+    	</div>
+    	<div id="chart-select" style="display: inline-block; margin-left:30px;">
+    		Select Visualization type
+    		<select id="chartType" onchange="draw()">
+	    		<option value="Bar">Bar</option>
+	    		<option value="Column">Column</option>
+	    		<option value="Pie">Pie</option>
+	    		<option value="Line">Line</option>
+	    		<option value="Area">Area</option>
+	    		<option value="Scatter">Scatter</option>
+	    	</select>
+    	</div>
+    </div>	
+    <div id="output"></div>
 
 	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 	<script type="text/javascript" src="./visualization.js"></script>
