@@ -31,7 +31,10 @@ function drawBar (data, category) {
 
   var widthScale = d3.scaleLinear()
     .domain([0, d3.max(values)])
-    .range([1, 1100])
+    .range([1, 1000])
+
+  var color = d3.scaleOrdinal()
+    .range(['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00'])
 
   var canvas = drawCanvas(data)
   var elements = canvas.selectAll('g')
@@ -44,16 +47,78 @@ function drawBar (data, category) {
       return widthScale(d.value)
     })
     .attr('height', 550 / data.length - 2)
-    .attr('x', 20)
+    .attr('x', 100)
     .attr('y', function (d, i) {
       return 550 / data.length * i + 10
     })
-    .attr('fill', 'gray')
-    .style('opacity', '0.5')
+    .attr('fill', function (d, i) {
+      return color(i)
+    })
+
+  elements.append('text')
+    .attr('x', 10)
+    .attr('y', function (d, i) {
+      return (550 / data.length * i + 10) + (550 / data.length - 2) / 2
+    })
+    .attr('dy', '.35em')
+    .attr('id', 'states')
+    .text(function (d) {
+      return d.key
+    })
 }
 
 function drawColumn (data, category) {
-  console.log(data, '\ndrawing column chart')
+  values = []
+  data = aggregateData(data, category)
+  data.sort(function (a, b) {
+    return b.value - a.value
+  })
+
+  data.forEach(element => {
+    values.push(element.value)
+  })
+
+  var heightScale = d3.scaleLinear()
+    .domain([0, d3.max(values)])
+    .range([1, 500])
+
+  var color = d3.scaleOrdinal()
+    .range(['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00'])
+
+  var canvas = drawCanvas(data)
+  var elements = canvas.selectAll('g')
+    .data(data)
+    .enter()
+    .append('g')
+  var rect = elements.append('rect')
+    .data(data)
+    .attr('width', 550 / data.length - 10)
+    .attr('height', function (d) {
+      return heightScale(d.value)
+    })
+    .attr('x', function (d, i) {
+      return 550 / data.length * i + 100
+    })
+    .attr('y', function (d) {
+      return 550 - heightScale(d.value)
+    })
+    .attr('fill', function (d, i) {
+      return color(i)
+    })
+
+  elements.append('text')
+    .attr('x', -600)
+    .attr('y', function (d, i) {
+      return (550 / data.length * i + 100) + (550 / data.length - 10) / 2
+    })
+    .attr('dy', '.35em')
+    .attr('id', 'states')
+    .text(function (d) {
+      return d.key
+    })
+    .attr('transform', function (d) {
+      return 'rotate(-90)'
+    })
 }
 
 function drawPie (data, category) {
@@ -64,6 +129,9 @@ function drawPie (data, category) {
   var height = 550
   var radius = Math.min(width, height) / 2
   canvas.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')')
+
+  var color = d3.scaleOrdinal()
+    .range(['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00'])
 
   var arc = d3.arc()
     .outerRadius(radius - 10)
@@ -87,7 +155,9 @@ function drawPie (data, category) {
 
   g.append('path')
     .attr('d', arc)
-    .style('fill', 'blue')
+    .style('fill', function (d, i) {
+      return color(i)
+    })
 
   g.append('text')
     .attr('transform', function (d) {
@@ -169,7 +239,7 @@ function drawArea (data, category) {
 }
 
 function drawScatter (data, category) {
-  console.log(data, '\ndrawing Scatter chart')
+  var canvas = drawCanvas(data)
 }
 
 function drawCanvas (data) {
