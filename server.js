@@ -4,11 +4,11 @@ const path = require('path')
 const IO = require('./io-square-redis')
 const fs = require('fs')
 const bodyparser = require('body-parser')
-IO.redis.setClient(2)
-var app = express()
+const app = express()
 const http = require('http').Server(app)
 const sio = require('socket.io')(http)
 const sstream = require('socket.io-stream')
+IO.redis.setClient(2)
 
 app.use(express.static(path.resolve('.') + '/public'))
 app.use(bodyparser.json())
@@ -19,17 +19,6 @@ app.use(bodyparser.urlencoded({
 app.get('/', function (req, res) {
   res.sendFile(path.resolve('.') + 'public/index.html')
 })
-
-const parse = obj => {
-  return {
-    'address': JSON.parse(JSON.stringify(obj.address)),
-    'borough': obj.borough,
-    'cuisine': obj.cuisine,
-    'grades': JSON.parse(JSON.stringify(obj.grades)),
-    'name': obj.name,
-    'id': obj.restaurant_id
-  }
-}
 
 app.get('/data/borough', function (req, res) {
   IO.redis.hgetall('borough_counts').then(v => {
