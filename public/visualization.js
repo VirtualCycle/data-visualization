@@ -21,6 +21,9 @@ function getData (category, callback) {
 function drawBar (data, category) {
   values = []
   data = aggregateData(data, category)
+  data.sort(function (a, b) {
+    return b.value - a.value
+  })
 
   data.forEach(element => {
     values.push(element.value)
@@ -45,7 +48,8 @@ function drawBar (data, category) {
     .attr('y', function (d, i) {
       return 550 / data.length * i + 10
     })
-    .attr('fill', 'black')
+    .attr('fill', 'gray')
+    .style('opacity', '0.5')
 }
 
 function drawColumn (data, category) {
@@ -55,6 +59,7 @@ function drawColumn (data, category) {
 function drawPie (data, category) {
   var canvas = drawCanvas(data)
   data = aggregateData(data, category)
+
   var width = 1200
   var height = 550
   var radius = Math.min(width, height) / 2
@@ -98,22 +103,42 @@ function drawPie (data, category) {
 }
 
 function aggregateData (data, category) {
-  var arr = [
-    {'key': '<5',
-    'value': 0},
-    {'key': '6-10',
-    'value': 0},
-    {'key': '11-20',
-    'value': 0},
-    {'key': '>20',
-    'value': 0}
-  ]
-
-  // if (category === 'cuisine') {
-
-  // }
+  if (category === 'cuisine') {
+    var arr = []
+    data.sort(function (a, b) {
+      return b.value - a.value
+    })
+    var total = 0
+    for (var i = 0; i < data.length; i++) {
+      if (i < 17) {
+        if (data[i].key.indexOf('Latin') !== -1) {
+          arr.push({'key': 'Latin',
+          'value': data[i].value})
+        } else if (data[i].key.indexOf('Other') !== -1) {
+          total += data[i].value
+        } else {
+          arr.push(data[i])
+        }
+      } else {
+        total += data[i].value
+      }
+    }
+    arr.push({'key': 'Others', 'value': total})
+    console.log(data, arr)
+    return arr
+  }
 
   if (category === 'score') {
+    var arr = [
+      {'key': '<5',
+      'value': 0},
+      {'key': '6-10',
+      'value': 0},
+      {'key': '11-20',
+      'value': 0},
+      {'key': '>20',
+      'value': 0}
+    ]
     data.forEach(element => {
       if (element.key == null || element.key <= 5) {
         arr[0].value += element.value
@@ -127,6 +152,9 @@ function aggregateData (data, category) {
       if (element.key > 20) {
         arr[3].value += element.value
       }
+    })
+    arr.sort(function (a, b) {
+      return a.value - b.value
     })
     return arr
   } else return data
