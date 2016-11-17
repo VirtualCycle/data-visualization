@@ -15,7 +15,7 @@ function importData (data) {
         // console.log(reply)
         setBorough(data[i].borough, data[i].restaurant_id)
         setCuisine(data[i].cuisine, data[i].restaurant_id)
-        setGrades(data[i].grades, data[i].restaurant_id)
+        setGrades(data[i].grades, data[i].restaurant_id, data[i].name)
       })
     })
   }
@@ -36,8 +36,11 @@ function setCuisine (cuisine, id) {
 // client.sadd(cuisine, id, redis.print)
 }
 
-function setGrades (grades, id) {
+function setGrades (grades, id, name) {
   if (grades.length !== 0) {
+    if (grades.length > 8) {
+      client.hset('gradesScatter', name, JSON.stringify(grades), redis.print)
+    }
     client.hincrby('grades', grades[0].grade.toString(), 1)
     client.hincrby('score', JSON.stringify(grades[0].score), 1)
   }

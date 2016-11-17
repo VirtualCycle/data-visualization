@@ -8,7 +8,11 @@ function getData (category, callback) {
       for (key in response) {
         var obj = {}
         obj['key'] = key
-        obj['value'] = parseInt(response[key])
+        if (category == 'scoreScatter') {
+          obj['value'] = JSON.parse(response[key])
+        }else {
+          obj['value'] = parseInt(response[key])
+        }
         arr.push(obj)
       }
       callback(arr, category)
@@ -31,23 +35,28 @@ function drawBar (data, category) {
 
   var widthScale = d3.scaleLinear()
     .domain([0, d3.max(values)])
-    .range([1, 1000])
+    .range([1, 800])
+  var heightScale = function () {
+    var height = 550 / data.length - 2
+    if (height > 50) {
+      return 50
+    }
+    return height
+  }
 
   var color = d3.scaleOrdinal()
     .range(['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00'])
 
-  var canvas = drawCanvas(data)
+  var canvas = drawCanvas()
   var elements = canvas.selectAll('g')
     .data(data)
     .enter()
     .append('g')
   var rect = elements.append('rect')
     .data(data)
-    .attr('width', function (d) {
-      return widthScale(d.value)
-    })
-    .attr('height', 550 / data.length - 2)
-    .attr('x', 100)
+    .attr('width', 0)
+    .attr('height', heightScale())
+    .attr('x', 170)
     .attr('y', function (d, i) {
       return 550 / data.length * i + 10
     })
@@ -55,10 +64,17 @@ function drawBar (data, category) {
       return color(i)
     })
 
+  rect.transition()
+    .duration(1500)
+    .attr('width', function (d) {
+      return widthScale(d.value)
+    })
+
   elements.append('text')
-    .attr('x', 10)
+    .style('text-anchor', 'end')
+    .attr('x', 160)
     .attr('y', function (d, i) {
-      return (550 / data.length * i + 10) + (550 / data.length - 2) / 2
+      return (550 / data.length * i + 10) + heightScale() / 2
     })
     .attr('dy', '.35em')
     .attr('id', 'states')
@@ -80,12 +96,12 @@ function drawColumn (data, category) {
 
   var heightScale = d3.scaleLinear()
     .domain([0, d3.max(values)])
-    .range([1, 500])
+    .range([1, 450])
 
   var color = d3.scaleOrdinal()
     .range(['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00'])
 
-  var canvas = drawCanvas(data)
+  var canvas = drawCanvas()
   var elements = canvas.selectAll('g')
     .data(data)
     .enter()
@@ -93,25 +109,30 @@ function drawColumn (data, category) {
   var rect = elements.append('rect')
     .data(data)
     .attr('width', 550 / data.length - 10)
-    .attr('height', function (d) {
-      return heightScale(d.value)
-    })
+    .attr('height', 0)
     .attr('x', function (d, i) {
       return 550 / data.length * i + 100
     })
-    .attr('y', function (d) {
-      return 550 - heightScale(d.value)
-    })
+    .attr('y', 500)
     .attr('fill', function (d, i) {
       return color(i)
     })
 
+  rect.transition()
+    .duration(1500)
+    .attr('y', function (d) {
+      return 500 - heightScale(d.value)
+    })
+    .attr('height', function (d) {
+      return heightScale(d.value)
+    })
+
   elements.append('text')
-    .attr('x', -600)
+    .style('text-anchor', 'end')
+    .attr('x', -510)
     .attr('y', function (d, i) {
       return (550 / data.length * i + 100) + (550 / data.length - 10) / 2
     })
-    .attr('dy', '.35em')
     .attr('id', 'states')
     .text(function (d) {
       return d.key
@@ -122,10 +143,10 @@ function drawColumn (data, category) {
 }
 
 function drawPie (data, category) {
-  var canvas = drawCanvas(data)
+  var canvas = drawCanvas()
   data = aggregateData(data, category)
 
-  var width = 1200
+  var width = 1000
   var height = 550
   var radius = Math.min(width, height) / 2
   canvas.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')')
@@ -172,7 +193,120 @@ function drawPie (data, category) {
     })
 }
 
+function drawLine (data, category) {
+  var canvas = drawCanvas()
+  var temp = aggregateData(data, category)
+  var dates = temp.shift()
+  var data = temp.shift()
+  var minDate = temp.shift()
+  var maxDate = temp.shift()
+
+  var dateScale = d3.scaleTime()
+    .domain([+minDate, +maxDate])
+    .range([0, 800])
+}
+
+function drawArea (data, category) {
+  var canvas = drawCanvas()
+  var temp = aggregateData(data, category)
+  var dates = temp.shift()
+  var data = temp.shift()
+  var minDate = temp.shift()
+  var maxDate = temp.shift()
+
+  var dateScale = d3.scaleTime()
+    .domain([+minDate, +maxDate])
+    .range([0, 800])
+}
+
+function drawScatter (data, category) {
+  var canvas = drawCanvas()
+  var temp = aggregateData(data, category)
+  var dates = temp.shift()
+  var data = temp.shift()
+  var minDate = temp.shift()
+  var maxDate = temp.shift()
+
+  console.log(+minDate, +maxDate)
+
+  var dateScale = d3.scaleTime()
+    .domain([+minDate, +maxDate])
+    .range([10, 860])
+  var scoreScale = d3.scaleLinear()
+    .domain([-1, 50])
+    .range([0, 450])
+  var color = d3.scaleOrdinal(d3.schemeCategory10)
+
+  for (var i = 0; i < data.length; i++) {
+    console.log(JSON.stringify(data[i].value))
+    var str = '#' + i.toString()
+    var elements = canvas.selectAll('.circles').filter(i.toString())
+      .data(data[i].value)
+      .enter()
+      .append('g')
+      .attr('class', 'circles' + i)
+
+    var circles = elements.append('circle')
+      .attr('cx', function (d) {
+        return dateScale(+d.date['$date'])
+      })
+      .attr('cy', function (d) {
+        return 500 - scoreScale(d.score)
+      })
+      .attr('r', 6)
+      .attr('fill', function (d, i) {
+        return color(i)
+      })
+      .style('opacity', '0.7')
+      .attr('id', function (d) {
+        return d.score
+      })
+  }
+  var legend = canvas.selectAll('.legend').filter(i.toString())
+    .data(data)
+    .enter()
+    .append('g')
+    .attr('class', 'legend' + i)
+
+  var text = legend.append('text')
+    .attr('x', 800)
+    .attr('y', function (d, i) {
+      return i * 15 + 50
+    })
+    .text(function (d) {
+      return d.key
+    })
+  var rect = legend.append('rect')
+    .attr('x', 780)
+    .attr('y', function (d, i) {
+      return i * 15 - 7.5 + 50
+    })
+    .attr('width', '15px')
+    .attr('height', '10px')
+    .attr('fill', function (d, i) {
+      return color(i)
+    })
+
+  console.log(dateScale(+minDate))
+}
+
 function aggregateData (data, category) {
+  if (category === 'scoreScatter') {
+    minmax = []
+    var dates = []
+    for (var i = 0; i < data.length; i++) {
+      for (var j = 0; j < data[i].value.length; j++) {
+        minmax.push(parseInt(data[i].value[j].date['$date']))
+        dates.push(new Date(data[i].value[j].date['$date']))
+      }
+    }
+    minmax.sort(function (a, b) {
+      return a - b
+    })
+    min = new Date(minmax[0])
+    max = new Date(minmax[minmax.length - 1])
+    return [dates, data, min, max]
+  }
   if (category === 'cuisine') {
     var arr = []
     data.sort(function (a, b) {
@@ -194,7 +328,7 @@ function aggregateData (data, category) {
       }
     }
     arr.push({'key': 'Others', 'value': total})
-    console.log(data, arr)
+    // console.log(data, arr)
     return arr
   }
 
@@ -230,20 +364,8 @@ function aggregateData (data, category) {
   } else return data
 }
 
-function drawLine (data, category) {
-  console.log(data, '\ndrawing Line chart')
-}
-
-function drawArea (data, category) {
-  console.log(data, '\ndrawing Area Chart')
-}
-
-function drawScatter (data, category) {
-  var canvas = drawCanvas(data)
-}
-
 function drawCanvas (data) {
-  var width = 1200
+  var width = 1000
   var height = 600
   d3.select('svg').remove()
 
@@ -264,6 +386,10 @@ function draw () {
   var chart = document.getElementById('chartType')
   var chartType = chart.options[chart.selectedIndex].value
 
-  getData(catType, window['draw' + chartType])
+  if (chartType == 'Scatter' || chartType == 'Line' || chartType == 'Area') {
+    getData('scoreScatter', window['draw' + chartType])
+  } else {
+    getData(catType, window['draw' + chartType])
+  }
 }
 draw()

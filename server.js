@@ -44,6 +44,12 @@ app.get('/data/score', function (req, res) {
   })
 })
 
+app.get('/data/scoreScatter', function (req, res) {
+  IO.redis.hgetall('gradesScatter').then(v => {
+    res.send(JSON.stringify(v))
+  })
+})
+
 const port = 3000
 http.listen(port, () => {
   console.log('Running on port ' + port)
