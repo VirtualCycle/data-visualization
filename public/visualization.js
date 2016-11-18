@@ -80,6 +80,14 @@ function drawBar (data, category) {
     .text(function (d) {
       return d.key
     })
+
+  xaxisScale = d3.scaleLinear()
+    .range([1, 800])
+
+  var xaxis = canvas.append('g')
+    .attr('class', 'axis axis--x')
+    .attr('transform', 'translate(' + 170 + ',' + 560 + ')')
+    .call(d3.axisBottom(xaxisScale))
 }
 
 function drawColumn (data, category) {
@@ -138,6 +146,14 @@ function drawColumn (data, category) {
     .attr('transform', function (d) {
       return 'rotate(-90)'
     })
+
+  yaxisScale = d3.scaleLinear()
+    .range([450, 0])
+
+  var yaxis = canvas.append('g')
+    .attr('class', 'axis axis--x')
+    .attr('transform', 'translate(' + 70 + ',' + 50 + ')')
+    .call(d3.axisLeft(yaxisScale))
 }
 
 function drawPie (data, category) {
@@ -202,14 +218,20 @@ function drawLine (data, category) {
     .domain([+minDate, +maxDate])
     .range([0, 800])
 
+  var xaxisScale = d3.scaleLinear()
+    .range([50, 900])
+
+  var yaxisScale = d3.scaleLinear()
+    .range([450, 0])
+
   var color = d3.scaleOrdinal(d3.schemeCategory10)
 
   var x = d3.scaleTime()
     .domain([+minDate, +maxDate])
-    .rangeRound([0, 1000])
+    .rangeRound([0, 900])
 
   var y = d3.scaleLinear()
-    .domain([0, 60])
+    .domain([-1, 50])
     .rangeRound([500, 0])
 
   var g = canvas.append('g')
@@ -224,6 +246,7 @@ function drawLine (data, category) {
       })
 
     var line = d3.line()
+      .curve(d3.curveBasis)
       .x(function (d) {
         return x(d.date['$date'])
       })
@@ -254,6 +277,15 @@ function drawLine (data, category) {
     .attr('fill', function (d, i) {
       return color(i)
     })
+
+  var xaxis = canvas.append('g')
+    .attr('class', 'axis axis--x')
+    .attr('transform', 'translate(0,' + 500 + ')')
+    .call(d3.axisBottom(xaxisScale))
+  var yaxis = canvas.append('g')
+    .attr('class', 'axis axis--y')
+    .attr('transform', 'translate(' + 40 + ',' + 50 + ')')
+    .call(d3.axisLeft(yaxisScale))
 }
 
 function drawArea (data, category) {
@@ -279,9 +311,18 @@ function drawScatter (data, category) {
   var minDate = temp.shift()
   var maxDate = temp.shift()
 
+  var xaxisScale = d3.scaleLinear()
+    .domain(new Date(+minDate), new Date(+maxDate))
+    .range([50, 900])
+
+  var yaxisScale = d3.scaleLinear()
+    .range([450, 0])
+
+  var date_format = d3.timeFormat('%Y-%m-%d')
+
   var dateScale = d3.scaleTime()
     .domain([+minDate, +maxDate])
-    .range([10, 860])
+    .range([30, 860])
   var scoreScale = d3.scaleLinear()
     .domain([-1, 50])
     .range([0, 450])
@@ -336,6 +377,19 @@ function drawScatter (data, category) {
     .attr('fill', function (d, i) {
       return color(i)
     })
+
+  var xaxis = canvas.append('g')
+    .attr('class', 'axis axis--x')
+    .attr('transform', 'translate(0,' + 500 + ')')
+    .call(d3.axisBottom(xaxisScale))
+
+  var yaxis = canvas.append('g')
+    .attr('class', 'axis axis--y')
+    // .tickValue([2010, 2011, 2012, 2013, 2014, 2015, 2016])
+    .attr('transform', 'translate(' + 48 + ',' + 50 + ')')
+    .call(d3.axisLeft(yaxisScale))
+
+  console.log(new Date(+minDate), new Date(+maxDate))
 }
 
 function aggregateData (data, category) {
@@ -376,7 +430,6 @@ function aggregateData (data, category) {
       }
     }
     arr.push({'key': 'Others', 'value': total})
-    // console.log(data, arr)
     return arr
   }
 
