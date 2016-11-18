@@ -43,3 +43,8 @@ g text {
     font: 10px sans-serif;
 }
 
+path { 
+  stroke-width: 2;
+  fill: none;
+}
+
