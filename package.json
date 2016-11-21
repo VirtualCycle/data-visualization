@@ -2,8 +2,9 @@
   "name": "data-visualization",
   "version": "1.0.0",
   "description": "A project to visualize data using D3.js",
-  "main": "import.js",
+  "main": "server.js",
   "scripts": {
+    "import": "node import.js ",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
